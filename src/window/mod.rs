@@ -73,6 +73,9 @@ pub struct ResolvedWindowRules {
     /// Whether the window should open focused.
     pub open_focused: Option<bool>,
 
+    /// Whether the window should be auto-consumed into an existing column.
+    pub open_consume_into_column: Option<bool>,
+
     /// Extra bound on the minimum window width.
     pub min_width: Option<u16>,
     /// Extra bound on the minimum window height.
@@ -249,6 +252,10 @@ impl ResolvedWindowRules {
 
                 if let Some(x) = rule.open_focused {
                     resolved.open_focused = Some(x);
+                }
+
+                if let Some(x) = rule.open_consume_into_column {
+                    resolved.open_consume_into_column = Some(x);
                 }
 
                 if let Some(x) = rule.min_width {

@@ -192,6 +192,8 @@ impl CompositorHandler for State {
                         })
                         .map(|(mapped, _)| mapped.window.clone());
 
+                    let should_auto_consume = !is_floating && rules.open_consume_into_column.unwrap_or(false);
+
                     // The mapped pre-commit hook deals with dma-bufs on its own.
                     self.remove_default_dmabuf_pre_commit_hook(surface);
                     let hook = add_mapped_toplevel_pre_commit_hook(toplevel);
@@ -218,6 +220,11 @@ impl CompositorHandler for State {
                         activate,
                     );
                     let output = output.cloned();
+
+                    // Try to auto-consume the window into an existing matching column if configured.
+                    if should_auto_consume {
+                        self.niri.layout.auto_consume_window(&window);
+                    }
 
                     // The window state cannot contain Fullscreen and Maximized at once. Therefore,
                     // if the window ended up fullscreen, then we only know that it is also

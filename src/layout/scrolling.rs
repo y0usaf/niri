@@ -1990,6 +1990,49 @@ impl<W: LayoutElement> ScrollingSpace<W> {
         new_tile.animate_move_from(offset);
     }
 
+    pub fn auto_consume_window(&mut self, window_id: &W::Id) {
+        if self.columns.len() < 2 {
+            return;
+        }
+
+        // Find the column containing the newly opened window.
+        let Some(new_col_idx) = self.columns.iter().position(|col| col.contains(window_id)) else {
+            return;
+        };
+
+        // Find the first column (left to right) that is not the new window's column and has at
+        // least one tile with open_consume_into_column = true.
+        let Some(target_col_idx) = self
+            .columns
+            .iter()
+            .enumerate()
+            .position(|(idx, col)| {
+                idx != new_col_idx
+                    && col.tiles().any(|(tile, _)| {
+                        tile.window()
+                            .rules()
+                            .open_consume_into_column
+                            .unwrap_or(false)
+                    })
+            })
+        else {
+            return;
+        };
+
+        // Remove the new window's tile from its column.
+        let removed = self.remove_tile(window_id, Transaction::new());
+
+        // If the new column was to the left of the target, removing it shifts the target index
+        // down by one.
+        let adjusted_target_idx = if new_col_idx < target_col_idx {
+            target_col_idx - 1
+        } else {
+            target_col_idx
+        };
+
+        self.add_tile_to_column(adjusted_target_idx, None, removed.tile, true);
+    }
+
     pub fn expel_from_column(&mut self) {
         if self.columns.is_empty() {
             return;

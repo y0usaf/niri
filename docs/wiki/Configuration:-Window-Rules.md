@@ -48,6 +48,7 @@ window-rule {
     open-fullscreen true
     open-floating true
     open-focused false
+    open-consume-into-column true
 
     // Properties that apply continuously.
     draw-border-with-background false
@@ -510,6 +511,41 @@ window-rule {
     open-focused true
 }
 ```
+
+#### `open-consume-into-column`
+
+<sup>Since: unreleased</sup>
+
+Set this to `true` to automatically merge (consume) this window into an existing column containing another window with the same setting.
+
+This is useful for automatically stacking similar windows (e.g., multiple terminals) without requiring manual intervention.
+When a new window matching this rule opens, it will be automatically merged into any existing column that contains another window with `open-consume-into-column` enabled.
+
+```kdl
+// Automatically stack foot terminals as tabs in the same column.
+window-rule {
+    match app-id="^foot$"
+
+    default-column-display "tabbed"
+    open-consume-into-column true
+}
+```
+
+This works particularly well when combined with `default-column-display "tabbed"` to create a tabbed interface for grouped windows.
+
+```kdl
+// Stack multiple browsers (Firefox and Chromium) in the same column without tabs.
+window-rule {
+    match app-id="firefox"
+    match app-id="chromium"
+
+    open-consume-into-column true
+}
+```
+
+> [!NOTE]
+> This property only applies to windows opened in the tiled (non-floating) layout.
+> Floating windows are not affected by this setting.
 
 ### Dynamic Properties
 

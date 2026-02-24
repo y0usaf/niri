@@ -1066,6 +1066,15 @@ impl<W: LayoutElement> Layout<W> {
         }
     }
 
+    pub fn auto_consume_window(&mut self, window_id: &W::Id) {
+        if let Some(ws) = self
+            .workspaces_mut()
+            .find(|ws| ws.has_window(window_id))
+        {
+            ws.auto_consume_window(window_id);
+        }
+    }
+
     pub fn remove_window(
         &mut self,
         window: &W::Id,

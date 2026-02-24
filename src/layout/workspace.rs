@@ -1120,6 +1120,14 @@ impl<W: LayoutElement> Workspace<W> {
         self.scrolling.consume_into_column();
     }
 
+    pub fn auto_consume_window(&mut self, window_id: &W::Id) {
+        // Skip floating windows; auto-consume only applies to tiled layout.
+        if self.floating.has_window(window_id) {
+            return;
+        }
+        self.scrolling.auto_consume_window(window_id);
+    }
+
     pub fn expel_from_column(&mut self) {
         if self.floating_is_active.get() {
             return;
